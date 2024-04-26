@@ -24,6 +24,7 @@ DigitalIn mq2(PE_12);
 
 void gasSensorInit()
 {
+    mq2.mode(PullUp);
 }
 
 void gasSensorUpdate()
