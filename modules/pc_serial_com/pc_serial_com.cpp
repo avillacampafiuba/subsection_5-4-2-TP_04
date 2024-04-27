@@ -141,12 +141,19 @@ void pcSerialComCodeCompleteWrite( bool state )
 
 static void pcSerialComStringRead( char* str, int strLength )
 {
+    #if TEST == TEST_OG 
     int strIndex;
     for ( strIndex = 0; strIndex < strLength; strIndex++) {
         uartUsb.read( &str[strIndex] , 1 );
         uartUsb.write( &str[strIndex] ,1 );
     }
     str[strLength]='\0';
+    
+    #endif
+
+    #if TEST == TEST_NB
+    #endif
+
 }
 
 static void pcSerialComGetCodeUpdate( char receivedChar )
