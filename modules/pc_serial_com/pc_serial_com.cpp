@@ -15,13 +15,28 @@
 
 //=====[Declaration of private defines]========================================
 
+#define TEST_ORIGINAL 0
+#define TEST_1 1
+#define TEST_X TEST_1
+
 //=====[Declaration of private data types]=====================================
 
+#if TEST_X == TEST_ORIGINAL
 typedef enum{
     PC_SERIAL_COMMANDS,
     PC_SERIAL_GET_CODE,
     PC_SERIAL_SAVE_NEW_CODE,
 } pcSerialComMode_t;
+#endif  // TEST_ORIGINAL
+
+#if TEST_X == TEST_1
+typedef enum{
+    PC_SERIAL_COMMANDS,
+    PC_SERIAL_GET_CODE,
+    PC_SERIAL_SAVE_NEW_CODE,
+    PC_SERIAL_SET_DATE_AND_TIME,
+} pcSerialComMode_t;
+#endif  // TEST_1
 
 //=====[Declaration and initialization of public global objects]===============
 
@@ -45,6 +60,9 @@ static void pcSerialComStringRead( char* str, int strLength );
 
 static void pcSerialComGetCodeUpdate( char receivedChar );
 static void pcSerialComSaveNewCodeUpdate( char receivedChar );
+#if TEST_X == TEST_1
+static void pcSerialComSetDateAndTimeUpdate( char receivedChar );
+#endif  // TEST_1
 
 static void pcSerialComCommandUpdate( char receivedChar );
 
@@ -97,6 +115,11 @@ void pcSerialComUpdate()
             case PC_SERIAL_SAVE_NEW_CODE:
                 pcSerialComSaveNewCodeUpdate( receivedChar );
             break;
+            #if TEST_X == TEST_1
+            case PC_SERIAL_SET_DATE_AND_TIME:
+                pcSerialComSetDateAndTimeUpdate( receivedChar );
+            break;
+            #endif
             default:
                 pcSerialComMode = PC_SERIAL_COMMANDS;
             break;
@@ -152,6 +175,13 @@ static void pcSerialComSaveNewCodeUpdate( char receivedChar )
         pcSerialComStringWrite( "\r\nNew code configured\r\n\r\n" );
     } 
 }
+
+#if TEST_X == TEST_1
+static void pcSerialComSetDateAndTimeUpdate( char receivedChar )
+{
+
+}
+#endif  // TEST_1
 
 static void pcSerialComCommandUpdate( char receivedChar )
 {
