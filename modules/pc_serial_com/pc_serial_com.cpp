@@ -36,6 +36,15 @@ typedef enum{
     PC_SERIAL_SAVE_NEW_CODE,
     PC_SERIAL_SET_DATE_AND_TIME,
 } pcSerialComMode_t;
+
+typedef enum{
+    SET_YEAR,
+    SET_MONTH,
+    SET_DAY,
+    SET_HOUR,
+    SET_MINUTE,
+    SET_SECOND,
+} dateAndTimeSettingMode_t;
 #endif  // TEST_1
 
 //=====[Declaration and initialization of public global objects]===============
@@ -53,6 +62,24 @@ char codeSequenceFromPcSerialCom[CODE_NUMBER_OF_KEYS];
 static pcSerialComMode_t pcSerialComMode = PC_SERIAL_COMMANDS;
 static bool codeComplete = false;
 static int numberOfCodeChars = 0;
+
+#if TEST_X == TEST_1
+    static dateAndTimeSettingMode_t dateAndTimeSettingMode = SET_YEAR;
+
+    static bool yearComplete = false;
+    static bool monthComplete = false;
+    static bool dayComplete = false;
+    static bool hourComplete = false;
+    static bool minuteComplete = false;
+    static bool secondComplete = false;
+    static int numberOfYearChars = 0;
+    static int numberOfMonthChars = 0;
+    static int numberOfDayChars = 0;
+    static int numberOfHourChars = 0;
+    static int numberOfMinuteChars = 0;
+    static int numberOfSecondChars = 0;
+#endif  // TEST_1
+
 
 //=====[Declarations (prototypes) of private functions]========================
 
@@ -186,7 +213,22 @@ static void pcSerialComSaveNewCodeUpdate( char receivedChar )
 #if TEST_X == TEST_1
 static void pcSerialComSetDateAndTimeUpdate( char receivedChar )
 {
-
+    switch ( dateAndTimeSettingMode ) {
+        case SET_YEAR:
+        break;
+        case SET_MONTH:
+        break;
+        case SET_DAY:
+        break;
+        case SET_HOUR:
+        break;
+        case SET_MINUTE:
+        break;
+        case SET_SECOND:
+        break;
+        default:
+        break;
+    }
 }
 #endif  // TEST_1
 
@@ -288,6 +330,7 @@ static void commandShowCurrentTemperatureInFahrenheit()
     pcSerialComStringWrite( str );  
 }
 
+#if TEST_X == TEST_ORIGINAL
 static void commandSetDateAndTime()
 {
     char year[5] = "";
@@ -326,6 +369,26 @@ static void commandSetDateAndTime()
     dateAndTimeWrite( atoi(year), atoi(month), atoi(day), 
         atoi(hour), atoi(minute), atoi(second) );
 }
+#endif  // TEST_ORIGINAL
+
+#if TEST_X == TEST_1
+static void commandSetDateAndTime()
+{
+    numberOfYearChars = 0;
+    numberOfMonthChars = 0;
+    numberOfDayChars = 0;
+    numberOfHourChars = 0;
+    numberOfMinuteChars = 0;
+    numberOfSecondChars = 0;
+    yearComplete = false;
+    monthComplete = false;
+    dayComplete = false;
+    hourComplete = false;
+    minuteComplete = false;
+    secondComplete = false;
+    pcSerialComMode = PC_SERIAL_SET_DATE_AND_TIME;
+}
+#endif  // TEST_1
 
 static void commandShowDateAndTime()
 {
