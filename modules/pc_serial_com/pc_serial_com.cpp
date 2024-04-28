@@ -13,6 +13,20 @@
 #include "gas_sensor.h"
 #include "event_log.h"
 
+//=====[Comentarios de los cambios]============================================
+
+/*
+El comando para setear fecha y hora era bloqueante porque se quedaba esperando a que el usuario ingrese todos los dígitos.
+Para hacerlo no bloqueante agrandamos la máquina de estados pcSerialComMode con un nuevo modo: PC_SERIAL_SET_DATE_AND_TIME
+
+El comando commandSetDateAndTime() ahora hace entrar a la máquina en este estado. Además se creó la máquina de estados
+dateAndTimeSettingMode para que el usuario ingrese los datos de la misma forma que lo hace para ingresar el código
+de desbloqueo de la alarma o para cambiar dicho código. Es decir, que cuando el usuario ingresa un dígito se entra en
+esta máquina de estados y se guarda dicho dígito donde corresponda. El programa continúa funcionando normalmente hasta
+que el usuario ingresa el siguiente dígito. Cuando se ingresan todos los dígitos se setea la fecha y hora y la
+máquina de estados pcSerialComMode vuelve al modo PC_SERIAL_COMMANDS
+*/
+
 //=====[Declaration of private defines]========================================
 
 #define TEST_ORIGINAL 0
@@ -38,17 +52,11 @@ typedef enum{
 } pcSerialComMode_t;
 
 typedef enum{
-    SET_YEAR_INITIAL,
     SET_YEAR,
-    SET_MONTH_INITIAL,
     SET_MONTH,
-    SET_DAY_INITIAL,
     SET_DAY,
-    SET_HOUR_INITIAL,
     SET_HOUR,
-    SET_MINUTE_INITIAL,
     SET_MINUTE,
-    SET_SECOND_INITIAL,
     SET_SECOND,
 } dateAndTimeSettingMode_t;
 #endif  // TEST_1
@@ -70,14 +78,8 @@ static bool codeComplete = false;
 static int numberOfCodeChars = 0;
 
 #if TEST_X == TEST_1
-    static dateAndTimeSettingMode_t dateAndTimeSettingMode = SET_YEAR;
+    static dateAndTimeSettingMode_t dateAndTimeSettingMode;
 
-    static bool yearComplete = false;
-    static bool monthComplete = false;
-    static bool dayComplete = false;
-    static bool hourComplete = false;
-    static bool minuteComplete = false;
-    static bool secondComplete = false;
     static int numberOfYearChars = 0;
     static int numberOfMonthChars = 0;
     static int numberOfDayChars = 0;
@@ -437,12 +439,6 @@ static void commandSetDateAndTime()
     numberOfHourChars = 0;
     numberOfMinuteChars = 0;
     numberOfSecondChars = 0;
-    yearComplete = false;
-    monthComplete = false;
-    dayComplete = false;
-    hourComplete = false;
-    minuteComplete = false;
-    secondComplete = false;
     pcSerialComMode = PC_SERIAL_SET_DATE_AND_TIME;
     dateAndTimeSettingMode = SET_YEAR;
     pcSerialComStringWrite("\r\nType four digits for the current year (YYYY): ");
