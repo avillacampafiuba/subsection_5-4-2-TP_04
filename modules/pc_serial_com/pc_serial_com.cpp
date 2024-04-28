@@ -38,11 +38,17 @@ typedef enum{
 } pcSerialComMode_t;
 
 typedef enum{
+    SET_YEAR_INITIAL,
     SET_YEAR,
+    SET_MONTH_INITIAL,
     SET_MONTH,
+    SET_DAY_INITIAL,
     SET_DAY,
+    SET_HOUR_INITIAL,
     SET_HOUR,
+    SET_MINUTE_INITIAL,
     SET_MINUTE,
+    SET_SECOND_INITIAL,
     SET_SECOND,
 } dateAndTimeSettingMode_t;
 #endif  // TEST_1
@@ -213,18 +219,69 @@ static void pcSerialComSaveNewCodeUpdate( char receivedChar )
 #if TEST_X == TEST_1
 static void pcSerialComSetDateAndTimeUpdate( char receivedChar )
 {
+    static char newYear[YEAR_NUMBER_OF_KEYS];
+    static char newMonth[MONTH_NUMBER_OF_KEYS];
+    static char newDay[DAY_NUMBER_OF_KEYS];
+    static char newHour[HOUR_NUMBER_OF_KEYS];
+    static char newMinute[MINUTE_NUMBER_OF_KEYS];
+    static char newSecond[SECOND_NUMBER_OF_KEYS];
+
     switch ( dateAndTimeSettingMode ) {
         case SET_YEAR:
+            newYear[numberOfYearChars] = receivedChar;
+            numberOfYearChars++;
+            if ( numberOfYearChars >= YEAR_NUMBER_OF_KEYS ) {
+                dateAndTimeSettingMode = SET_MONTH;
+                numberOfYearChars = 0;
+                pcSerialComStringWrite("\r\nType two digits for the current month (01-12): ");
+            }
         break;
         case SET_MONTH:
+            newMonth[numberOfMonthChars] = receivedChar;
+            numberOfMonthChars++;
+            if ( numberOfMonthChars >= MONTH_NUMBER_OF_KEYS ) {
+                dateAndTimeSettingMode = SET_DAY;
+                numberOfMonthChars = 0;
+                pcSerialComStringWrite("\r\nType two digits for the current day (01-31): ");
+            }
         break;
         case SET_DAY:
+            newDay[numberOfDayChars] = receivedChar;
+            numberOfDayChars++;
+            if ( numberOfDayChars >= DAY_NUMBER_OF_KEYS ) {
+                dateAndTimeSettingMode = SET_HOUR;
+                numberOfDayChars = 0;
+                pcSerialComStringWrite("\r\nType two digits for the current hour (00-23): ");
+            }
         break;
         case SET_HOUR:
+            newHour[numberOfHourChars] = receivedChar;
+            numberOfHourChars++;
+            if ( numberOfHourChars >= HOUR_NUMBER_OF_KEYS ) {
+                dateAndTimeSettingMode = SET_MINUTE;
+                numberOfHourChars = 0;
+                pcSerialComStringWrite("\r\nType two digits for the current minutes (00-59): ");
+            }
         break;
         case SET_MINUTE:
+            newMinute[numberOfMinuteChars] = receivedChar;
+            numberOfMinuteChars++;
+            if ( numberOfMinuteChars >= MINUTE_NUMBER_OF_KEYS ) {
+                dateAndTimeSettingMode = SET_SECOND;
+                numberOfMinuteChars = 0;
+                pcSerialComStringWrite("\r\nType two digits for the current seconds (00-59): ");
+            }
         break;
         case SET_SECOND:
+            newSecond[numberOfSecondChars] = receivedChar;
+            numberOfSecondChars++;
+            if ( numberOfSecondChars >= SECOND_NUMBER_OF_KEYS ) {
+                numberOfSecondChars = 0;
+                pcSerialComStringWrite("\r\nDate and time has been set\r\n");
+                dateAndTimeWrite( atoi(newYear), atoi(newMonth), atoi(newDay), 
+                    atoi(newHour), atoi(newMinute), atoi(newSecond) );
+                pcSerialComMode = PC_SERIAL_COMMANDS;
+            }
         break;
         default:
         break;
@@ -387,6 +444,8 @@ static void commandSetDateAndTime()
     minuteComplete = false;
     secondComplete = false;
     pcSerialComMode = PC_SERIAL_SET_DATE_AND_TIME;
+    dateAndTimeSettingMode = SET_YEAR;
+    pcSerialComStringWrite("\r\nType four digits for the current year (YYYY): ");
 }
 #endif  // TEST_1
 
