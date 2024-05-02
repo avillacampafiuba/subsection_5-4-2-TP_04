@@ -176,19 +176,12 @@ void pcSerialComCodeCompleteWrite( bool state )
 
 static void pcSerialComStringRead( char* str, int strLength )
 {
-    #if TEST == TEST_OG 
     int strIndex;
     for ( strIndex = 0; strIndex < strLength; strIndex++) {
         uartUsb.read( &str[strIndex] , 1 );
         uartUsb.write( &str[strIndex] ,1 );
     }
     str[strLength]='\0';
-    
-    #endif
-
-    #if TEST == TEST_NB
-    #endif
-
 }
 
 static void pcSerialComGetCodeUpdate( char receivedChar )
@@ -221,18 +214,19 @@ static void pcSerialComSaveNewCodeUpdate( char receivedChar )
 #if TEST_X == TEST_1
 static void pcSerialComSetDateAndTimeUpdate( char receivedChar )
 {
-    static char newYear[YEAR_NUMBER_OF_KEYS];
-    static char newMonth[MONTH_NUMBER_OF_KEYS];
-    static char newDay[DAY_NUMBER_OF_KEYS];
-    static char newHour[HOUR_NUMBER_OF_KEYS];
-    static char newMinute[MINUTE_NUMBER_OF_KEYS];
-    static char newSecond[SECOND_NUMBER_OF_KEYS];
+    static char newYear[YEAR_NUMBER_OF_KEYS + 1];
+    static char newMonth[MONTH_NUMBER_OF_KEYS + 1];
+    static char newDay[DAY_NUMBER_OF_KEYS + 1];
+    static char newHour[HOUR_NUMBER_OF_KEYS + 1];
+    static char newMinute[MINUTE_NUMBER_OF_KEYS + 1];
+    static char newSecond[SECOND_NUMBER_OF_KEYS + 1];
 
     switch ( dateAndTimeSettingMode ) {
         case SET_YEAR:
             newYear[numberOfYearChars] = receivedChar;
             numberOfYearChars++;
             if ( numberOfYearChars >= YEAR_NUMBER_OF_KEYS ) {
+                newYear[YEAR_NUMBER_OF_KEYS] = '\0';
                 dateAndTimeSettingMode = SET_MONTH;
                 numberOfYearChars = 0;
                 pcSerialComStringWrite("\r\nType two digits for the current month (01-12): ");
@@ -242,6 +236,7 @@ static void pcSerialComSetDateAndTimeUpdate( char receivedChar )
             newMonth[numberOfMonthChars] = receivedChar;
             numberOfMonthChars++;
             if ( numberOfMonthChars >= MONTH_NUMBER_OF_KEYS ) {
+                newMonth[MONTH_NUMBER_OF_KEYS] = '\0';
                 dateAndTimeSettingMode = SET_DAY;
                 numberOfMonthChars = 0;
                 pcSerialComStringWrite("\r\nType two digits for the current day (01-31): ");
@@ -251,6 +246,7 @@ static void pcSerialComSetDateAndTimeUpdate( char receivedChar )
             newDay[numberOfDayChars] = receivedChar;
             numberOfDayChars++;
             if ( numberOfDayChars >= DAY_NUMBER_OF_KEYS ) {
+                newDay[DAY_NUMBER_OF_KEYS] = '\0';
                 dateAndTimeSettingMode = SET_HOUR;
                 numberOfDayChars = 0;
                 pcSerialComStringWrite("\r\nType two digits for the current hour (00-23): ");
@@ -260,6 +256,7 @@ static void pcSerialComSetDateAndTimeUpdate( char receivedChar )
             newHour[numberOfHourChars] = receivedChar;
             numberOfHourChars++;
             if ( numberOfHourChars >= HOUR_NUMBER_OF_KEYS ) {
+                newHour[HOUR_NUMBER_OF_KEYS] = '\0';
                 dateAndTimeSettingMode = SET_MINUTE;
                 numberOfHourChars = 0;
                 pcSerialComStringWrite("\r\nType two digits for the current minutes (00-59): ");
@@ -269,6 +266,7 @@ static void pcSerialComSetDateAndTimeUpdate( char receivedChar )
             newMinute[numberOfMinuteChars] = receivedChar;
             numberOfMinuteChars++;
             if ( numberOfMinuteChars >= MINUTE_NUMBER_OF_KEYS ) {
+                newMinute[MINUTE_NUMBER_OF_KEYS] = '\0';
                 dateAndTimeSettingMode = SET_SECOND;
                 numberOfMinuteChars = 0;
                 pcSerialComStringWrite("\r\nType two digits for the current seconds (00-59): ");
@@ -278,6 +276,7 @@ static void pcSerialComSetDateAndTimeUpdate( char receivedChar )
             newSecond[numberOfSecondChars] = receivedChar;
             numberOfSecondChars++;
             if ( numberOfSecondChars >= SECOND_NUMBER_OF_KEYS ) {
+                newSecond[SECOND_NUMBER_OF_KEYS] = '\0';
                 numberOfSecondChars = 0;
                 pcSerialComStringWrite("\r\nDate and time has been set\r\n");
                 dateAndTimeWrite( atoi(newYear), atoi(newMonth), atoi(newDay), 
